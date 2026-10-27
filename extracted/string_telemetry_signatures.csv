@@ -1,0 +1,15 @@
+Flash Address (v0.2.5),MCU Offset (v0.2.5),Flash Address (v0.3.0),MCU Offset (v0.3.0),String Literal,Category,Notes
+0x08000B3B,0x0B3B,0x08000B0B,0x0B0B,"%s probably missed detect",Diagnostic,Sensor / peripheral detection warning
+0x0800221B,0x221B,0x080021E7,0x21E7,"L_Box:The temperature of the NTC is too high",Thermal Safety,Left chamber NTC thermal cutoff
+0x0800224C,0x224C,0x08002218,0x2218,"R_Box:The temperature of the NTC is too high",Thermal Safety,Right chamber NTC thermal cutoff
+N/A,N/A,0x08002760,0x2760,"L_Tar:%dC, R_Tar:%dC, ",UART Telemetry,New in v0.3.0: Target temperature telemetry
+N/A,N/A,0x0800277C,0x277C,"L_PTC:%d, R_PTC:%d, ",UART Telemetry,New in v0.3.0: PTC heater state telemetry
+N/A,N/A,0x0800279C,0x279C,"L_NTC:%d.%dC, R_NTC:%d.%dC, ",UART Telemetry,New in v0.3.0: NTC thermistor telemetry
+N/A,N/A,0x080027C0,0x27C0,"L_AHT:%d.%dC, %d.%d%%RH, ",UART Telemetry,New in v0.3.0: Left AHT temp/RH telemetry
+N/A,N/A,0x080027DC,0x27DC,"R_AHT:%d.%dC, %d.%d%%RH",UART Telemetry,New in v0.3.0: Right AHT temp/RH telemetry
+0x08002784,0x2784,0x080027F8,0x27F8,"L_Box: PTC fault! Stop heating",Thermal Safety,Left chamber PTC runaway protection
+0x080027A8,0x27A8,0x0800281C,0x281C,"R_Box: PTC fault! Stop heating",Thermal Safety,Right chamber PTC runaway protection
+0x080027CC,0x27CC,0x08002840,0x2840,"L_Box: detected an artificial opening of the cover.",Interlock Safety,Left chamber lid interlock
+0x08002804,0x2804,0x08002878,0x2878,"R_Box: detected an artificial opening of the cover.",Interlock Safety,Right chamber lid interlock
+0x080042B4,0x42B4,0x080042E4,0x42E4,"May 13 2025 -> Mar  2 2026",Build Metadata,Firmware compilation date string
+0x080042C4,0x42C4,0x080042F0,0x42F0,"Software version: V%d.%d.%d, Date:%s",Build Metadata,Version banner format string

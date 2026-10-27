@@ -1,0 +1,3 @@
+# Standard library used by default (struct, sys, os, re, difflib)
+# Optional reverse-engineering helpers:
+capstone>=5.0.0

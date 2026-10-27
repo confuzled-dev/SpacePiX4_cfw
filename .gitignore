@@ -1,0 +1,12 @@
+# Firmware container binaries
+firmware/*.lcd
+
+# Extracted binary partitions
+extracted/*.bin
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/

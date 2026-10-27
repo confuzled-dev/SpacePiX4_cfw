@@ -1,0 +1,3 @@
+Firmware Image,Container Size (Bytes),Header Flags,Header Magic,MCU Offset (Hex),MCU Offset (Bytes),UI Partition File,UI Partition Size (Bytes),MCU Partition File,MCU Partition Size (Bytes),Initial Stack Pointer (SP),Reset Vector
+v0.2.5_0.5.lcd,4440664,0x0100,CT2E,0x437168,4419944,extracted/v0.2.5_0.5_ui.bin,4419944,extracted/v0.2.5_0.5_mcu.bin,20720,0x20001358,0x08000241
+v0.3.0_0.7.lcd,4441828,0x0100,CT2E,0x4375E4,4421092,extracted/v0.3.0_0.7_ui.bin,4421092,extracted/v0.3.0_0.7_mcu.bin,20736,0x20001350,0x08000241
