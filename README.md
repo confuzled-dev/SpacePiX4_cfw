@@ -3,11 +3,11 @@
 An open-source reverse engineering, binary analysis, and custom firmware build framework for the **Creality SpacePi X4** dual-chamber filament dryer (`DB-05` hardware platform).
 
 > [!NOTE]
-> **Base Firmware Policy:** The latest official 1st-party release (**`v0.2.9_3.1_cspx4.lcd`**, MCU build `"Jun  1 2026"` + refactored UI `"_3.1"`) is the official source base for all custom firmware builds and future revisions. Older firmware versions (`v0.2.5_0.5`, `v0.3.0_0.7`, `v0.3.0_0.8`, `v0.2.9_1.1`) have been fully disassembled, mapped, and cataloged in `docs/` and `extracted/` for reference, but are not required for ongoing firmware builds.
+> **Base Firmware Policy:** The latest official 1st-party release (**`v0.2.9_3.1_cspx4.lcd`**, MCU build `"Jun  1 2026"` + refactored UI `"_3.1"`) is the official working framework for all custom firmware builds and future revisions. Older firmware versions have been moved to `firmware/FW_Archive/` and are fully cataloged in `docs/` and `extracted/` for reference. All custom firmware files append `*_cfw` before the `.lcd` extension, with prior custom builds archived in `firmware/CFW_Archive/`.
 
 ---
 
-## Custom Firmware `3.0.1_0` (`v3.0.1_0_cspx4.lcd`)
+## Custom Firmware `3.0.1_0` (`v3.0.1_0_cspx4_cfw.lcd`)
 
 Built directly on top of the official **`v0.2.9_3.1_cspx4.lcd`** base, custom firmware **`3.0.1_0`** (reported as **`V3.0.1_0`** on the About screen) incorporates:
 
@@ -52,7 +52,7 @@ Built directly on top of the official **`v0.2.9_3.1_cspx4.lcd`** base, custom fi
 
 ---
 
-### `v3.0.1_0_cspx4.lcd` Exact Binary Patch & Checksum Table
+### `v3.0.1_0_cspx4_cfw.lcd` Exact Binary Patch & Checksum Table
 
 | Subsystem | `.lcd` Offset | Partition Offset | Original Bytes (`v0.2.9_3.1`) | Patched Bytes (`3.0.1_0`) | Description |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -82,11 +82,11 @@ Built directly on top of the official **`v0.2.9_3.1_cspx4.lcd`** base, custom fi
 | `v0.3.0_0.8.lcd` | `4,441,816` B | `CT2E` (`0x0100`) | `4,421,080` B | `20,736` B | `Dec 18 2025` | `90°C` (`194°F`) | `48h` (`2880m`) | Fixes UI lag after switching languages (`Page 17` removed redundant `wepo 0,90`) |
 | `v0.2.9_1.1_cspx4.lcd` | `4,444,236` B | `CT2E` (`0x0100`) | `4,421,392` B | `22,844` B | `Jun  1 2026` | `90°C` (`194°F`) | `48h` (`2880m`) | Major MCU expansion (`+2,108` B: per-chamber fault hysteresis, 55-entry fan ramp table); Auto Dry increased from `8h` to `12h` (`720m`) |
 | `v0.2.9_3.1_cspx4.lcd` | `4,161,192` B | `DT` (`0x01F7`) | `4,138,348` B | `22,844` B | `Jun  1 2026` | `90°C` (`194°F`) | `48h` (`2880m`) | **Official 1st-party base**: `-283 KB` UI bytecode refactoring into 8 global subroutines (`sub 0..7`), 35 pages, 218 pictures |
-| **`v3.0.1_0_cspx4.lcd`** | **`4,161,192` B** | **`DT` (`0x01F7`)** | **`4,138,348` B** | **`22,844` B** | **`Jun  1 2026`** | **`95°C` (`203°F`)** | **`48h` (`2880m`)** | **Custom firmware: `95°C`/`203°F` max temp (UI+MCU), native `1×1` `320×240` splash, boot disclaimer notice, version `3.0.1_0`** |
+| **`v3.0.1_0_cspx4_cfw.lcd`** | **`4,161,192` B** | **`DT` (`0x01F7`)** | **`4,138,348` B** | **`22,844` B** | **`Jun  1 2026`** | **`95°C` (`203°F`)** | **`48h` (`2880m`)** | **Custom firmware: `95°C`/`203°F` max temp (UI+MCU), native `1×1` `320×240` splash, boot disclaimer notice, version `3.0.1_0`** |
 
 ---
 
-## Building & Installing `v3.0.1_0_cspx4.lcd`
+## Building & Installing `v3.0.1_0_cspx4_cfw.lcd`
 
 ### Build from Source
 1. Place the official base firmware `v0.2.9_3.1_cspx4.lcd` into `firmware/`.
@@ -95,13 +95,13 @@ Built directly on top of the official **`v0.2.9_3.1_cspx4.lcd`** base, custom fi
    node scripts/build_3.0.1_0.js
    ```
 3. The script outputs:
-   - `firmware/v3.0.1_0_cspx4.lcd` (`4,161,192` bytes, ready to flash)
-   - `extracted/v3.0.1_0_cspx4_ui.bin` & `extracted/v3.0.1_0_cspx4_mcu.bin`
+   - `firmware/v3.0.1_0_cspx4_cfw.lcd` (`4,161,192` bytes, ready to flash)
+   - `extracted/v3.0.1_0_cspx4_cfw_ui.bin` & `extracted/v3.0.1_0_cspx4_cfw_mcu.bin`
    - `extracted/v3.0.1_0_splash_preview.png` & `extracted/v3.0.1_0_pic65_gauge_preview.png`
 
 ### Flash onto SpacePi X4
 1. Format a microSD card as **FAT32** (`4096`-byte allocation unit size recommended).
-2. Copy `firmware/v3.0.1_0_cspx4.lcd` (or `3.0.1_0_cspx4.lcd`) to the root directory of the microSD card (ensure it is the **only** `.lcd` file on the card).
+2. Copy `firmware/v3.0.1_0_cspx4_cfw.lcd` to the root directory of the microSD card (ensure it is the **only** `.lcd` file on the card).
 3. Power off the SpacePi X4, insert the microSD card into the display slot, and power the unit on.
 4. Wait for the TJC bootloader transfer and MCU update to complete, then remove the microSD card and power-cycle if prompted.
 
@@ -111,12 +111,17 @@ Built directly on top of the official **`v0.2.9_3.1_cspx4.lcd`** base, custom fi
 - `docs/` — Architectural documentation, binary memory maps, and LLM operational guidelines:
   - [`MEMORY_BANK.md`](docs/MEMORY_BANK.md): Project status, primary discoveries, and completed milestones.
   - [`BINARY_MAP.md`](docs/BINARY_MAP.md): Container header (`CT2E` / `DT`), checksums, HMI picture table (`0a600103` RLE), and ARM Cortex-M flash/RAM layout.
-  - [`EXTRACTION_REPORT.md`](docs/EXTRACTION_REPORT.md): Comprehensive 5-version factory diff and `A3.0.0` custom firmware specification.
+  - [`EXTRACTION_REPORT.md`](docs/EXTRACTION_REPORT.md): Comprehensive 5-version factory diff and `3.0.1_0` custom firmware specification.
   - [`LLM_PROMPT_BOOK.md`](docs/LLM_PROMPT_BOOK.md): Operational guidelines for AI-assisted firmware analysis.
 - `scripts/` — Analysis, extraction, and custom firmware build utilities:
-  - [`build_A3.0.0.js`](scripts/build_A3.0.0.js): Builds custom firmware `A3.0.0_cspx4.lcd` from `v0.2.9_3.1_cspx4.lcd`.
+  - [`build_3.0.1_0.js`](scripts/build_3.0.1_0.js): Builds active custom firmware `v3.0.1_0_cspx4_cfw.lcd` from `v0.2.9_3.1_cspx4.lcd`.
+  - [`build_A3.0.0.js`](scripts/build_A3.0.0.js): Builds custom firmware `A3.0.0_cspx4_cfw.lcd` from `v0.2.9_3.1_cspx4.lcd`.
   - [`extract.py`](scripts/extract.py): Unpacks `.lcd` firmware containers into UI and MCU partitions.
   - [`diff_mcu.py`](scripts/diff_mcu.py): Performs binary region diffing across MCU payloads.
   - [`patch_splash.py`](scripts/patch_splash.py): Legacy in-place `Pic 81` RLE splash patcher and `CT2E` CRC-32 verifier.
-- `firmware/` — Directory for target `.lcd` firmware images (ignored by Git).
+- `firmware/` — Target `.lcd` firmware images:
+  - `v0.2.9_3.1_cspx4.lcd` — Official 1st-party base working framework.
+  - `v3.0.1_0_cspx4_cfw.lcd` — Active latest custom firmware.
+  - `FW_Archive/` — Archived older factory releases (`v0.2.5_0.5`, `v0.3.0_0.7`, `v0.3.0_0.8`, `v0.2.9_1.1`).
+  - `CFW_Archive/` — Archived older custom firmware builds (`3.0.1_0_cspx4_cfw`, `A3.0.0_cspx4_cfw`, etc.).
 - `extracted/` — Output directory for carved partitions, CSV exports, and decoded splash previews.

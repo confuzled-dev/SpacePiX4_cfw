@@ -458,16 +458,13 @@ console.log(`    - Header2 CRC (0x18C):   0x${newHdr2Crc.toString(16).padStart(8
 console.log(`    - UI Master CRC (0x3F2568): 0x${newUiCrc.toString(16).padStart(8, '0')} (mask=0x${mask.toString(16)})`);
 
 // 8. Save outputs and decoded verification previews
-const outFwPaths = [
-  path.resolve(__dirname, '../firmware/v3.0.1_0_cspx4.lcd'),
-  path.resolve(__dirname, '../firmware/3.0.1_0_cspx4.lcd')
-];
-const outUiPath = path.resolve(__dirname, '../extracted/v3.0.1_0_cspx4_ui.bin');
-const outMcuPath = path.resolve(__dirname, '../extracted/v3.0.1_0_cspx4_mcu.bin');
+const outFwPath = path.resolve(__dirname, '../firmware/v3.0.1_0_cspx4_cfw.lcd');
+const outUiPath = path.resolve(__dirname, '../extracted/v3.0.1_0_cspx4_cfw_ui.bin');
+const outMcuPath = path.resolve(__dirname, '../extracted/v3.0.1_0_cspx4_cfw_mcu.bin');
 const outSplashPreview = path.resolve(__dirname, '../extracted/v3.0.1_0_splash_preview.png');
 const outGaugePreview = path.resolve(__dirname, '../extracted/v3.0.1_0_pic65_gauge_preview.png');
 
-outFwPaths.forEach(p => fs.writeFileSync(p, lcd));
+fs.writeFileSync(outFwPath, lcd);
 fs.writeFileSync(outUiPath, lcd.subarray(0, mcuOff));
 fs.writeFileSync(outMcuPath, lcd.subarray(mcuOff));
 
@@ -483,4 +480,4 @@ const p81Rel = lcd.readUInt32LE(p81Entry + 4), p81Len = lcd.readUInt32LE(p81Entr
 const decoded81 = decodePicRle(lcd.subarray(picTblBase + p81Rel, picTblBase + p81Rel + p81Len));
 writePng(outSplashPreview, outW, outH, decoded81);
 
-console.log(`[+] Successfully built ${outFwPaths[0]} (${lcd.length} bytes)`);
+console.log(`[+] Successfully built ${outFwPath} (${lcd.length} bytes)`);

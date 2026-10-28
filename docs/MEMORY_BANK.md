@@ -22,4 +22,5 @@
 - [x] Investigate firmware container checksum verification routines (solved and verified on hardware).
 
 - [x] Compare all 5 official firmware revisions (`v0.2.5_0.5`, `v0.3.0_0.7`, `v0.3.0_0.8`, `v0.2.9_1.1_cspx4`, `v0.2.9_3.1_cspx4`) and verify `v0.2.9_3.1_cspx4.lcd` as the latest base firmware.
-- [x] Build custom firmware `A3.0.0_cspx4.lcd` (`95°C`/`203°F` max temperature across UI + MCU with thermal fault reporting preserved, full native `1×1` `320×240` custom splash screen, boot process disclaimer `"ALPHA FIRMWARE: NO WARRANTY, EXPRESS OR IMPLIED"`, and version `A3.0.0`).
+- [x] Build custom firmware `3.0.1_0_cfw` (`v3.0.1_0_cspx4_cfw.lcd`): fixes `65°C` chamber gauge ring artifact by restoring `Pic 0..80` and relocating `Pic 81` native `320×240` splash + disclaimer to asset zero-padding at `0x301180`, `95°C`/`203°F` ceiling across UI + MCU, and version `3.0.1_0`.
+- [x] Organize firmware archives into `firmware/FW_Archive/` (older official firmwares) and `firmware/CFW_Archive/` (older custom builds with `*_cfw.lcd` suffix).
