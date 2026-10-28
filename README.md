@@ -1,12 +1,15 @@
-# Creality SpacePi X4 Custom Firmware (`A3.0.0`) & Reverse Engineering Suite
+# Creality SpacePi X4 Custom Firmware (`3.0.1_0`) & Reverse Engineering Suite
 
 An open-source reverse engineering, binary analysis, and custom firmware build framework for the **Creality SpacePi X4** dual-chamber filament dryer (`DB-05` hardware platform).
 
+> [!NOTE]
+> **Base Firmware Policy:** The latest official 1st-party release (**`v0.2.9_3.1_cspx4.lcd`**, MCU build `"Jun  1 2026"` + refactored UI `"_3.1"`) is the official source base for all custom firmware builds and future revisions. Older firmware versions (`v0.2.5_0.5`, `v0.3.0_0.7`, `v0.3.0_0.8`, `v0.2.9_1.1`) have been fully disassembled, mapped, and cataloged in `docs/` and `extracted/` for reference, but are not required for ongoing firmware builds.
+
 ---
 
-## Custom Firmware `A3.0.0` (`A3.0.0_cspx4.lcd`)
+## Custom Firmware `3.0.1_0` (`v3.0.1_0_cspx4.lcd`)
 
-Built on top of the latest verified factory release (**`v0.2.9_3.1_cspx4.lcd`**, MCU build `"Jun  1 2026"` + refactored UI `"_3.1"`), custom firmware **`A3.0.0`** introduces the following modifications across both the **TJC/Nextion HMI Display Partition** and the **ARM Cortex-M0+ Microcontroller (MCU) Partition**:
+Built directly on top of the official **`v0.2.9_3.1_cspx4.lcd`** base, custom firmware **`3.0.1_0`** (reported as **`V3.0.1_0`** on the About screen) incorporates:
 
 ### 1. `95°C` (`203°F`) Maximum Temperature Ceiling (Up from `90°C` / `194°F`)
 - **HMI Display / UI Partition (`0x310054`):**
@@ -36,37 +39,37 @@ Built on top of the latest verified factory release (**`v0.2.9_3.1_cspx4.lcd`**,
 
 | Clean 65°C Chamber Gauge (`Pic 65`) | Native `1×1` Custom Splash + Disclaimer (`Pic 81`) |
 | :---: | :---: |
-| ![Chamber Gauge Preview](extracted/A3.0.0_pic65_gauge_preview.png) | ![Custom Splash Preview](extracted/A3.0.0_splash_preview.png) |
+| ![Chamber Gauge Preview](extracted/v3.0.1_0_pic65_gauge_preview.png) | ![Custom Splash Preview](extracted/v3.0.1_0_splash_preview.png) |
 
-### 4. Firmware Version `A3.0.0` (MCU + HMI UI)
+### 4. Firmware Version `3.0.1_0` (MCU + HMI UI)
 - **MCU Partition:**
-  - `.lcd` `0x3F6F2C` (`mcu.bin+0x49C0`): Version tuple `00 02 09 00` (`0.2.9`) → **`03 00 00 00` (`3.0.0`)**.
-  - `.lcd` `0x3F6F4E` (`mcu.bin+0x49E2`): Boot banner format string prefix `'V'` (`0x56`) → **`'A'` (`0x41`)** (`"Software version: A3.0.0, Date:Jun  1 2026\r\n"`).
+  - `.lcd` `0x3F6F2C` (`mcu.bin+0x49C0`): Version tuple `00 02 09 00` (`0.2.9`) → **`03 00 01 00` (`3.0.1`)**.
+  - `.lcd` `0x3F6F4E` (`mcu.bin+0x49E2`): Boot banner outputs `"Software version: V3.0.1, Date:Jun  1 2026\r\n"`.
 - **UI Partition:**
-  - `0x312BDD` (`sub 6`): Changes MCU handshake (`0x70`) version prefix from `'V'` (`0x56`) to **`'A'` (`0x41`)** so `str_0x00a2` evaluates to **`"A3.0.0"`**.
-  - `0x3517D3` (`Page 19` About Screen): Pre-populates `str_0x288d` default text with **`"A3.0.0\0"`**.
-  - `0x351852` (`Page 19` About Screen): Clears static UI suffix `str_0x2945` (`"_3.1"` → `""`) so `str_0x288d = str_0x00a2 + str_0x2945` displays **`"A3.0.0"`**.
+  - `0x312BDD` (`sub 6`): Retains `"V"` prefix so `str_0x00a2` evaluates to **`"V3.0.1"`**.
+  - `0x3517D3` (`Page 19` About Screen): Pre-populates `str_0x288d` default text with **`"V3.0.1_0\0"`**.
+  - `0x351852` (`Page 19` About Screen): Updates static UI suffix `str_0x2945` (`"_3.1"` → `"_0\0\0"`) so `str_0x288d = str_0x00a2 + str_0x2945` displays **`"V3.0.1_0"`**.
 
 ---
 
-### `A3.0.0_cspx4.lcd` Exact Binary Patch & Checksum Table
+### `v3.0.1_0_cspx4.lcd` Exact Binary Patch & Checksum Table
 
-| Subsystem | `.lcd` Offset | Partition Offset | Original Bytes (`v0.2.9_3.1`) | Patched Bytes (`A3.0.0`) | Description |
+| Subsystem | `.lcd` Offset | Partition Offset | Original Bytes (`v0.2.9_3.1`) | Patched Bytes (`3.0.1_0`) | Description |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **UI Max Temp (`var_0x0020`)** | `0x310054` | `ui.bin+0x310054` | `5A 00 00 00` (`90`) | `5F 00 00 00` (`95`) | Master UI ceiling (`95°C` / `203°F` across all pages & keypads) |
 | **MCU Max Temp (`MOVS R5, #95`)** | `0x3F3E4A` | `mcu.bin+0x18DE` | `5A 25` (`MOVS R5, #90`) | `5F 25` (`MOVS R5, #95`) | MCU target temperature clamping value in `0x080058D4` loop |
 | **MCU Max Temp (`CMP R2, #95`)** | `0x3F3E60` | `mcu.bin+0x18F4` | `5A 2A` (`CMP R2, #90`) | `5F 2A` (`CMP R2, #95`) | MCU target temperature upper-bound check (`95°C`) |
-| **MCU Version Tuple** | `0x3F6F2C` | `mcu.bin+0x49C0` | `00 02 09 00` (`0.2.9`) | `03 00 00 00` (`3.0.0`) | Reported via UART cmd `0x03` and boot banner |
-| **MCU Version Prefix** | `0x3F6F4E` | `mcu.bin+0x49E2` | `56` (`'V'`) | `41` (`'A'`) | `"Software version: A3.0.0, Date:Jun  1 2026\r\n"` |
-| **UI Version Prefix (`sub 6`)** | `0x312BDD` | `ui.bin+0x312BDD` | `56` (`'V'`) | `41` (`'A'`) | Formats `str_0x00a2` as `"A" + major + "." + minor + "." + patch` |
-| **UI About Initial Version** | `0x3517D3` | `ui.bin+0x3517D3` | `00 00 00 00 00 00 00` | `41 33 2E 30 2E 30 00` | Sets `Page 19` (`str_0x288d`) initial string to `"A3.0.0"` |
-| **UI About Version Suffix** | `0x351852` | `ui.bin+0x351852` | `5F 33 2E 31` (`"_3.1"`) | `00 00 00 00` (`""`) | Clears `str_0x2945` suffix so `Page 19` displays `"A3.0.0"` |
+| **MCU Version Tuple** | `0x3F6F2C` | `mcu.bin+0x49C0` | `00 02 09 00` (`0.2.9`) | `03 00 01 00` (`3.0.1`) | Reported via UART cmd `0x03` and boot banner |
+| **MCU Version Prefix** | `0x3F6F4E` | `mcu.bin+0x49E2` | `56` (`'V'`) | `56` (`'V'`) | `"Software version: V3.0.1, Date:Jun  1 2026\r\n"` |
+| **UI Version Prefix (`sub 6`)** | `0x312BDD` | `ui.bin+0x312BDD` | `56` (`'V'`) | `56` (`'V'`) | Formats `str_0x00a2` as `"V" + major + "." + minor + "." + patch` (`"V3.0.1"`) |
+| **UI About Initial Version** | `0x3517D3` | `ui.bin+0x3517D3` | `00 00 00 00 00 00 00` | `56 33 2E 30 2E 31 5F 30 00` | Sets `Page 19` (`str_0x288d`) initial string to `"V3.0.1_0"` |
+| **UI About Version Suffix** | `0x351852` | `ui.bin+0x351852` | `5F 33 2E 31` (`"_3.1"`) | `5F 30 00 00` (`"_0"`) | Suffix `str_0x2945` so `Page 19` displays `"V3.0.1_0"` |
 | **Native 1×1 Splash (`Pic 81`)** | `0x301180` | `ui.bin+0x301180` | `00 00 00 00...` (padding) | `41,882` B (`1,902` blks) | Native `320×240` (`1×1` pixel, 16-bit RGB565) custom splash + disclaimer |
 | **Pic 81 Descriptor** | `0x0551E5` | `ui.bin+0x0551E5` | `7A 35 1D 00` (`relOff`) | `4F C7 2A 00` (`relOff=0x2AC74F`) | Points Pic 81 descriptor to `0x301180`, `len=41882` |
-| **MCU Partition CRC-32** | `0x000008` | `ui.bin+0x000008` | `0xE04812FF` | `0xCDB98D14` | `nextion_crc_bytes(mcu_bin)` |
-| **Header Block 1 CRC-32** | `0x0000C4` | `ui.bin+0x0000C4` | `0x28AA5B32` | `0x97B4B463` | `nextion_crc_bytes(data[0x00:0xC4])` |
+| **MCU Partition CRC-32** | `0x000008` | `ui.bin+0x000008` | `0xE04812FF` | `0xC4752E90` | `nextion_crc_bytes(mcu_bin)` |
+| **Header Block 1 CRC-32** | `0x0000C4` | `ui.bin+0x0000C4` | `0x28AA5B32` | `0xBAC603C1` | `nextion_crc_bytes(data[0x00:0xC4])` |
 | **Header Block 2 CRC-32** | `0x00018C` | `ui.bin+0x00018C` | `0x35F9333A` | `0x35F9333A` | `nextion_crc_bytes(data[0xC8:0x18C])` |
-| **UI Master CRC-32 (`^ 0x66`)** | `0x3F2568` | `ui.bin+0x3F2568` | `0x2A48BFCA` | `0xF77CEEB3` | `nextion_crc_bytes(data[0x00:0x3F2568]) ^ 0x66` |
+| **UI Master CRC-32 (`^ 0x66`)** | `0x3F2568` | `ui.bin+0x3F2568` | `0x2A48BFCA` | `0x167B8BD2` | `nextion_crc_bytes(data[0x00:0x3F2568]) ^ 0x66` |
 
 ---
 
@@ -78,27 +81,27 @@ Built on top of the latest verified factory release (**`v0.2.9_3.1_cspx4.lcd`**,
 | `v0.3.0_0.7.lcd` | `4,441,828` B | `CT2E` (`0x0100`) | `4,421,092` B | `20,736` B | `Dec  3 2025` | `90°C` (`194°F`) | `48h` (`2880m`) | `90°C` limit, hybrid hour/min timer, cover filter, UART telemetry |
 | `v0.3.0_0.8.lcd` | `4,441,816` B | `CT2E` (`0x0100`) | `4,421,080` B | `20,736` B | `Dec 18 2025` | `90°C` (`194°F`) | `48h` (`2880m`) | Fixes UI lag after switching languages (`Page 17` removed redundant `wepo 0,90`) |
 | `v0.2.9_1.1_cspx4.lcd` | `4,444,236` B | `CT2E` (`0x0100`) | `4,421,392` B | `22,844` B | `Jun  1 2026` | `90°C` (`194°F`) | `48h` (`2880m`) | Major MCU expansion (`+2,108` B: per-chamber fault hysteresis, 55-entry fan ramp table); Auto Dry increased from `8h` to `12h` (`720m`) |
-| `v0.2.9_3.1_cspx4.lcd` | `4,161,192` B | `DT` (`0x01F7`) | `4,138,348` B | `22,844` B | `Jun  1 2026` | `90°C` (`194°F`) | `48h` (`2880m`) | Latest factory release: `-283 KB` UI bytecode refactoring into 8 global subroutines (`sub 0..7`), 35 pages, 218 pictures |
-| **`A3.0.0_cspx4.lcd`** | **`4,161,192` B** | **`DT` (`0x01F7`)** | **`4,138,348` B** | **`22,844` B** | **`Jun  1 2026`** | **`95°C` (`203°F`)** | **`48h` (`2880m`)** | **Custom firmware: `95°C`/`203°F` max temp (UI+MCU), native `1×1` `320×240` splash, boot disclaimer notice, version `A3.0.0`** |
+| `v0.2.9_3.1_cspx4.lcd` | `4,161,192` B | `DT` (`0x01F7`) | `4,138,348` B | `22,844` B | `Jun  1 2026` | `90°C` (`194°F`) | `48h` (`2880m`) | **Official 1st-party base**: `-283 KB` UI bytecode refactoring into 8 global subroutines (`sub 0..7`), 35 pages, 218 pictures |
+| **`v3.0.1_0_cspx4.lcd`** | **`4,161,192` B** | **`DT` (`0x01F7`)** | **`4,138,348` B** | **`22,844` B** | **`Jun  1 2026`** | **`95°C` (`203°F`)** | **`48h` (`2880m`)** | **Custom firmware: `95°C`/`203°F` max temp (UI+MCU), native `1×1` `320×240` splash, boot disclaimer notice, version `3.0.1_0`** |
 
 ---
 
-## Building & Installing `A3.0.0_cspx4.lcd`
+## Building & Installing `v3.0.1_0_cspx4.lcd`
 
 ### Build from Source
-1. Place the base factory firmware `v0.2.9_3.1_cspx4.lcd` into `firmware/`.
+1. Place the official base firmware `v0.2.9_3.1_cspx4.lcd` into `firmware/`.
 2. Run the Node.js builder script:
    ```bash
-   node scripts/build_A3.0.0.js
+   node scripts/build_3.0.1_0.js
    ```
 3. The script outputs:
-   - `firmware/A3.0.0_cspx4.lcd` (`4,161,192` bytes, ready to flash)
-   - `extracted/A3.0.0_cspx4_ui.bin` & `extracted/A3.0.0_cspx4_mcu.bin`
-   - `extracted/A3.0.0_boot_disclaimer_preview.png` & `extracted/A3.0.0_splash_preview.png`
+   - `firmware/v3.0.1_0_cspx4.lcd` (`4,161,192` bytes, ready to flash)
+   - `extracted/v3.0.1_0_cspx4_ui.bin` & `extracted/v3.0.1_0_cspx4_mcu.bin`
+   - `extracted/v3.0.1_0_splash_preview.png` & `extracted/v3.0.1_0_pic65_gauge_preview.png`
 
 ### Flash onto SpacePi X4
 1. Format a microSD card as **FAT32** (`4096`-byte allocation unit size recommended).
-2. Copy `firmware/A3.0.0_cspx4.lcd` to the root directory of the microSD card (ensure it is the **only** `.lcd` file on the card).
+2. Copy `firmware/v3.0.1_0_cspx4.lcd` (or `3.0.1_0_cspx4.lcd`) to the root directory of the microSD card (ensure it is the **only** `.lcd` file on the card).
 3. Power off the SpacePi X4, insert the microSD card into the display slot, and power the unit on.
 4. Wait for the TJC bootloader transfer and MCU update to complete, then remove the microSD card and power-cycle if prompted.
 
