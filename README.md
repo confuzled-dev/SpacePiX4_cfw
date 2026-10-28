@@ -1,23 +1,29 @@
-# Creality SpacePi X4 Custom Firmware (`3.0.1_0`) & Reverse Engineering Suite
+# Creality SpacePiX4 Custom Firmware & Reverse Engineering Suite #
+# (`Current_Ver 3.0.1_0`) #
 
-An open-source *LLM-led* reverse engineering, binary analysis, and custom firmware build framework for the **Creality SpacePi X4** dual-chamber filament dryer (`DB-05` hardware platform).
+An open-source *LLM-led* reverse engineering, binary analysis, and custom firmware build framework for the **Creality SpacePiX4** dual-chamber filament dryer (`DB-05` hardware platform).
 > [!WARNING]
-> **HARDWARE IS CAPABLE OF HIGHER TEMPERATURES, BUT EXTENSIVE TESTING HAS NOT FINISHED**
+> **HARDWARE IS CAPABLE OF HIGHER TEMPERATURES, BUT EXTENSIVE TESTING HAS NOT FINISHED.**
+>
+> **NO WARRANTY IS PROVIDED, EXPRESS OR IMPLIED. IF YOUR HOUSE BURNS DOWN, YOUR CAR WONT START, OR YOUR FROGS TURN GAY (*they always were*) DONT BLAME ME**
+> 
 > **THERE BE DRAGONS AHEAD**
 
 > [!NOTE]
-> **Base Firmware Policy:** The latest official 1st-party release (**`v0.2.9_3.1_cspx4.lcd`**, MCU build `"Jun  1 2026"` + refactored UI `"_3.1"`) is the official working framework for all custom firmware builds and future revisions. Older firmware versions have been moved to `firmware/FW_Archive/` and are fully cataloged in `docs/` and `extracted/` for reference. All custom firmware files append `*_cfw` before the `.lcd` extension, with prior custom builds archived in `firmware/CFW_Archive/`.
-
+> **Base Firmware**- A beta revision provided by Creality (**`v0.2.9_3.1_cspx4.lcd`**, MCU build `"Jun  1 2026"`) is the official working framework for all custom firmware builds and future revisions unless, and until, a newer first party update is available. Older firmware revisions have been archived in `firmware/FW_Archive/` and are fully cataloged in `docs/` and `extracted/` for reference.
+>
+> This process can be reversed by flashing the device via Micro SD card slot with a retail or beta firmware provided by Creality. The latest retail firmware is available [HERE](https://www.creality.com/download/creality-spacepi-x4)
 ---
 
 ## Custom Firmware `3.0.1_0` (`v3.0.1_0_cspx4_cfw.lcd`)
 
-Built directly on top of the official **`v0.2.9_3.1_cspx4.lcd`** base, custom firmware **`3.0.1_0`** (reported as **`V3.0.1_0`** on the About screen) incorporates:
+Built directly on top of the beta **`v0.2.9_3.1_cspx4.lcd`** base, custom firmware incorporates:
 
 ### 1. `95°C` (`203°F`) Maximum Temperature Ceiling (Up from `90°C` / `194°F`)
+> Latest retail firmware is limited to `85°C`. The `90°C` variant is not available through the official software portal.  
 - **HMI Display / UI Partition (`0x310054`):**
   - Updates master global variable `var_0x0020` (`max_temp_c`) at file offset `0x310054` from `90` (`0x5A`) to **`95` (`0x5F`)**.
-  - **Seamless UI Integration:** Because `v0.2.9_3.1_cspx4` derives all UI temperature limits from `var_0x0020`:
+  - **Seamless UI Integration:** `v0.2.9_3.1_cspx4` derives all UI temperature limits from `var_0x0020`:
     - **Celsius Mode (`temp_zh == 0`):** Sets `max_temp` (`var_0x013c`) to **`95°C`** and dynamically populates keypad prompts across all 10 languages as **`"Input range: 45~95"`**.
     - **Fahrenheit Mode (`temp_zh == 1`):** Global conversion subroutines `sub 0` (`0x3110F4`) and `sub 1` (`0x3111A0`) dynamically evaluate `(95 * 18 + 320) / 10 = 203`, setting `max_temp` (`var_0x013c`) to **`203°F`** and formatting keypad prompts as **`"Input range: 113~203"`**.
     - **All Screens Supported:** Keypad `OK` clamping (`Page 6`/`7`), `+` increment buttons, Manual/Preset Drying (`Page 8`), Auto Drying (`Page 14`/`15`/`16`), and "My Drying" custom presets (`Page 28`) all accept up to **`95°C` (`203°F`)** with zero deviation from the stock UI scheme.
