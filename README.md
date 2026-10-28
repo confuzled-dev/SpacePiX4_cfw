@@ -26,5 +26,6 @@ An open-source reverse engineering and analysis framework for the Creality Space
   - [`extract.py`](scripts/extract.py): Unpacks `.lcd` firmware containers into UI and MCU partitions.
   - [`diff_mcu.py`](scripts/diff_mcu.py): Performs binary region diffing across MCU payloads.
   - [`patch_splash.py`](scripts/patch_splash.py): Encodes and patches custom `320x240` boot splash screens (`Pic 81`) and verifies `CT2E` CRC-32 checksums.
+  - [`build_A3.0.0.js`](scripts/build_A3.0.0.js): Builds custom firmware `A3.0.0_cspx4.lcd` from `v0.2.9_3.1_cspx4.lcd` (95°C/203°F max temperature limit, native `1x1` `320x240` custom splash screen, boot process disclaimer notice, and version `A3.0.0`).
 - `firmware/` — Directory for target `.lcd` firmware images (ignored by Git).
 - `extracted/` — Output directory for carved partitions, CSV exports, and decoded splash previews.
