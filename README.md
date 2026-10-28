@@ -27,17 +27,16 @@ Built on top of the latest verified factory release (**`v0.2.9_3.1_cspx4.lcd`**,
       - **`[E04L/R]` (AHT20 Sensor Timeout):** Unchanged.
 
 ### 2. Full Native `320×240` (`1×1` Pixel, 16-Bit RGB565) Custom Splash Screen
-- Reallocates RLE block budgets across the final boot frames (`Pic 65..81`, `0x1CA086..0x22D113`) in the Picture Descriptor Table (`0x054A31`), expanding `Pic 81` from `900` RLE blocks (`20,840` bytes) to **`1,902` RLE blocks (`41,882` bytes)**.
-- Eliminates all horizontal pixel grouping (`2×1`/`3×1`) and color posterization — rendering the custom splash artwork at **100% native `1×1` pixel screen resolution (`320×240`)** with full 16-bit RGB565 anti-aliased shading, while keeping all 218 pictures strictly contiguous (`Pic 82` remains anchored at `0x22D113`).
+- Stores the full native `320×240` (`1×1` pixel, 16-bit RGB565) custom splash image (`Pic 81`, `1,902` RLE blocks = `41,882` bytes) in the `61,058`-byte unused zero-padding region (`0x301180..0x30B51A`) between the Font section and the Code section (`0x310000`).
+- **Preserves Heating Gauge Assets (`Pic 0..80`):** `Pic 0` through `Pic 80` are the dynamic circular temperature-gauge ring states (`0°C` to `80°C`) for the active drying chambers. Leaving `Pic 0..80` completely factory-original guarantees clean, artifact-free gauge rings at all drying temperatures (`0°C .. 95°C`).
+- Eliminates all horizontal pixel grouping (`2×1`/`3×1`) and color posterization, while keeping all 218 picture descriptors valid.
 
 ### 3. Boot Process Disclaimer Notice
-- Displays the required notice **`"ALPHA FIRMWARE: NO WARRANTY, EXPRESS OR IMPLIED"`** during the boot sequence:
-  - **Pre-Splash Boot Notice (`Pic 65..80`, `800 ms`):** Displays `"SPACEPI X4 CUSTOM FIRMWARE A3.0.0"`, `"MAX TEMPERATURE LIMIT: 95C / 203F"`, and `"ALPHA FIRMWARE: NO WARRANTY, EXPRESS OR IMPLIED"` along the bottom margin (`y = 227..233`).
-  - **Custom Splash Hold (`Pic 81`, `2,000 ms`):** Displays the native `1×1` `320×240` custom splash artwork above the `"ALPHA FIRMWARE: NO WARRANTY, EXPRESS OR IMPLIED"` banner (`y = 227..233`).
+- Displays the required notice **`"ALPHA FIRMWARE: NO WARRANTY, EXPRESS OR IMPLIED"`** prominently on the boot splash screen (`Pic 81`, held on `Page 0` for `2,000 ms` during startup) in crisp amber text (`y = 227..233`) along the bottom margin.
 
-| Pre-Splash Disclaimer (`Pic 65..80`) | Native `1×1` Custom Splash + Disclaimer (`Pic 81`) |
+| Clean 65°C Chamber Gauge (`Pic 65`) | Native `1×1` Custom Splash + Disclaimer (`Pic 81`) |
 | :---: | :---: |
-| ![Boot Disclaimer Preview](extracted/A3.0.0_boot_disclaimer_preview.png) | ![Custom Splash Preview](extracted/A3.0.0_splash_preview.png) |
+| ![Chamber Gauge Preview](extracted/A3.0.0_pic65_gauge_preview.png) | ![Custom Splash Preview](extracted/A3.0.0_splash_preview.png) |
 
 ### 4. Firmware Version `A3.0.0` (MCU + HMI UI)
 - **MCU Partition:**
@@ -62,12 +61,12 @@ Built on top of the latest verified factory release (**`v0.2.9_3.1_cspx4.lcd`**,
 | **UI Version Prefix (`sub 6`)** | `0x312BDD` | `ui.bin+0x312BDD` | `56` (`'V'`) | `41` (`'A'`) | Formats `str_0x00a2` as `"A" + major + "." + minor + "." + patch` |
 | **UI About Initial Version** | `0x3517D3` | `ui.bin+0x3517D3` | `00 00 00 00 00 00 00` | `41 33 2E 30 2E 30 00` | Sets `Page 19` (`str_0x288d`) initial string to `"A3.0.0"` |
 | **UI About Version Suffix** | `0x351852` | `ui.bin+0x351852` | `5F 33 2E 31` (`"_3.1"`) | `00 00 00 00` (`""`) | Clears `str_0x2945` suffix so `Page 19` displays `"A3.0.0"` |
-| **Boot Disclaimer (`Pic 65..80`)** | `0x1CA086..0x222D79` | `ui.bin+0x1CA086` | 16 animation frames | 16 RLE disclaimer frames | Displays version `A3.0.0`, `95C / 203F` limit, and alpha disclaimer |
-| **Native 1×1 Splash (`Pic 81`)** | `0x222D79..0x22D113` | `ui.bin+0x222D79` | `20,840` B (`900` blks) | `41,882` B (`1,902` blks) | Native `320×240` (`1×1` pixel, 16-bit RGB565) custom splash + disclaimer |
+| **Native 1×1 Splash (`Pic 81`)** | `0x301180` | `ui.bin+0x301180` | `00 00 00 00...` (padding) | `41,882` B (`1,902` blks) | Native `320×240` (`1×1` pixel, 16-bit RGB565) custom splash + disclaimer |
+| **Pic 81 Descriptor** | `0x0551E5` | `ui.bin+0x0551E5` | `7A 35 1D 00` (`relOff`) | `4F C7 2A 00` (`relOff=0x2AC74F`) | Points Pic 81 descriptor to `0x301180`, `len=41882` |
 | **MCU Partition CRC-32** | `0x000008` | `ui.bin+0x000008` | `0xE04812FF` | `0xCDB98D14` | `nextion_crc_bytes(mcu_bin)` |
 | **Header Block 1 CRC-32** | `0x0000C4` | `ui.bin+0x0000C4` | `0x28AA5B32` | `0x97B4B463` | `nextion_crc_bytes(data[0x00:0xC4])` |
 | **Header Block 2 CRC-32** | `0x00018C` | `ui.bin+0x00018C` | `0x35F9333A` | `0x35F9333A` | `nextion_crc_bytes(data[0xC8:0x18C])` |
-| **UI Master CRC-32 (`^ 0x66`)** | `0x3F2568` | `ui.bin+0x3F2568` | `0x2A48BFCA` | `0x296987BE` | `nextion_crc_bytes(data[0x00:0x3F2568]) ^ 0x66` |
+| **UI Master CRC-32 (`^ 0x66`)** | `0x3F2568` | `ui.bin+0x3F2568` | `0x2A48BFCA` | `0xF77CEEB3` | `nextion_crc_bytes(data[0x00:0x3F2568]) ^ 0x66` |
 
 ---
 

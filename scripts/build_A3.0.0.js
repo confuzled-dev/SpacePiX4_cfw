@@ -385,59 +385,23 @@ drawTextCentered5x7(splashRows, DISCLAIMER_TEXT, 227, amber565, 6);
 const encodedSplash = encodePicRle(splashRows, 0);
 console.log(`[*] Encoded Pic 81 (Full 1x1 Native Resolution Splash + Disclaimer): ${encodedSplash.numBlocks} blocks (${encodedSplash.buf.length} bytes)`);
 
-// 3. Build Boot Disclaimer Notice Screen for Pic 65..80 (16 frames = 800ms before Pic 81 2000ms hold)
-const disclaimerRows = Array.from({ length: outH }, () => new Array(outW).fill(0));
-drawTextCentered5x7(disclaimerRows, "SPACEPI X4 CUSTOM FIRMWARE A3.0.0", 96, green565, 6);
-drawTextCentered5x7(disclaimerRows, "MAX TEMPERATURE LIMIT: 95C / 203F", 118, white565, 6);
-drawTextCentered5x7(disclaimerRows, DISCLAIMER_TEXT, 227, amber565, 6);
-
-// Compute exact block budgets across Pic 65..81 so total size & contiguity are 100% preserved
+// 3. Write Full-Resolution Custom Splash + Disclaimer (Pic 81) into free padding at 0x301180
+// IMPORTANT: Pic 0..80 are the dynamic temperature gauge ring states (0°C..80°C) used by Page 2/3!
+// They must remain 100% factory-original to prevent UI artifacts when heating chambers to 65°C+.
+// Pic 82..217 and the Font table (0x2CA615..0x30117E) also remain 100% factory-original.
+// We place Pic 81 in the 61,058-byte unused zero-padding region (0x30117E..0x310000) right before the code section.
 const picTblBase = 0x054A31;
-const firstDisclaimerPic = 65;
-const numDisclaimerPics = 81 - firstDisclaimerPic; // 16 frames (Pic 65..80)
-let origTotalLen = 0;
-let origTotalBlocks = 0;
-for (let i = firstDisclaimerPic; i <= 81; i++) {
-  const p = picTblBase + i * 24;
-  const len = lcd.readUInt32LE(p + 12);
-  origTotalLen += len;
-  origTotalBlocks += (len - 1940) / 21;
-}
-const remainingBlocks = origTotalBlocks - encodedSplash.numBlocks;
-const basePerFrame = Math.floor(remainingBlocks / numDisclaimerPics);
-const extraFrames = remainingBlocks % numDisclaimerPics;
+const splashTargetOff = 0x301180; // 4-byte aligned inside free zero-padding
+const splashRelOff = splashTargetOff - picTblBase;
 
-const startAbsFirst = picTblBase + lcd.readUInt32LE(picTblBase + firstDisclaimerPic * 24 + 4);
-let writeCursor = startAbsFirst;
+encodedSplash.buf.copy(lcd, splashTargetOff);
 
-for (let i = firstDisclaimerPic; i <= 80; i++) {
-  const frameIdx = i - firstDisclaimerPic;
-  const targetBlk = basePerFrame + (frameIdx < extraFrames ? 1 : 0);
-  const enc = encodePicRle(disclaimerRows, targetBlk);
-  if (enc.numBlocks !== targetBlk) {
-    throw new Error(`Pic ${i} block count mismatch: expected ${targetBlk}, got ${enc.numBlocks} (natural=${enc.naturalBlocks})`);
-  }
-  const p = picTblBase + i * 24;
-  lcd.writeUInt32LE(writeCursor - picTblBase, p + 4);
-  lcd.writeUInt32LE(enc.buf.length, p + 12);
-  enc.buf.copy(lcd, writeCursor);
-  writeCursor += enc.buf.length;
-}
-
-// Write Pic 81
-{
-  const p81 = picTblBase + 81 * 24;
-  lcd.writeUInt32LE(writeCursor - picTblBase, p81 + 4);
-  lcd.writeUInt32LE(encodedSplash.buf.length, p81 + 12);
-  encodedSplash.buf.copy(lcd, writeCursor);
-  writeCursor += encodedSplash.buf.length;
-}
-
-const startAbs82 = picTblBase + lcd.readUInt32LE(picTblBase + 82 * 24 + 4); // 0x22D113
-console.log(`[*] Updated Pic 65..81 in Picture Descriptor Table: endCursor=0x${writeCursor.toString(16)} vs Pic 82=0x${startAbs82.toString(16)} (diff=${writeCursor - startAbs82})`);
-if (writeCursor !== startAbs82) {
-  throw new Error(`Contiguity check failed: writeCursor 0x${writeCursor.toString(16)} !== 0x${startAbs82.toString(16)}`);
-}
+// Update Pic 81 descriptor in Picture Descriptor Table
+const p81 = picTblBase + 81 * 24;
+lcd.writeUInt32LE(splashRelOff, p81 + 4);
+lcd.writeUInt32LE(encodedSplash.buf.length, p81 + 12);
+console.log(`[*] Placed Pic 81 in free asset padding at 0x${splashTargetOff.toString(16)} (relOff=0x${splashRelOff.toString(16)}, len=${encodedSplash.buf.length} bytes)`);
+console.log(`[*] Preserved Pic 0..80 (temperature gauge rings) and Pic 82..217 completely factory-original.`);
 
 // 4. Patch UI Max Temperature (90°C -> 95°C / 203°F)
 const uiMaxTempOff = 0x310054;
@@ -522,20 +486,21 @@ const outFwPath = path.resolve(__dirname, '../firmware/A3.0.0_cspx4.lcd');
 const outUiPath = path.resolve(__dirname, '../extracted/A3.0.0_cspx4_ui.bin');
 const outMcuPath = path.resolve(__dirname, '../extracted/A3.0.0_cspx4_mcu.bin');
 const outSplashPreview = path.resolve(__dirname, '../extracted/A3.0.0_splash_preview.png');
-const outDisclaimerPreview = path.resolve(__dirname, '../extracted/A3.0.0_boot_disclaimer_preview.png');
+const outGaugePreview = path.resolve(__dirname, '../extracted/A3.0.0_pic65_gauge_preview.png');
 
 fs.writeFileSync(outFwPath, lcd);
 fs.writeFileSync(outUiPath, lcd.subarray(0, mcuOff));
 fs.writeFileSync(outMcuPath, lcd.subarray(mcuOff));
 
-// Decode Pic 80 and Pic 81 directly from the written .lcd buffer to verify RLE integrity
-const p80 = picTblBase + 80 * 24;
-const p80Rel = lcd.readUInt32LE(p80 + 4), p80Len = lcd.readUInt32LE(p80 + 12);
-const decoded80 = decodePicRle(lcd.subarray(picTblBase + p80Rel, picTblBase + p80Rel + p80Len));
-writePng(outDisclaimerPreview, outW, outH, decoded80);
+// Decode Pic 65 directly from the written .lcd buffer to verify the heating ring is factory-clean
+const p65 = picTblBase + 65 * 24;
+const p65Rel = lcd.readUInt32LE(p65 + 4), p65Len = lcd.readUInt32LE(p65 + 12);
+const decoded65 = decodePicRle(lcd.subarray(picTblBase + p65Rel, picTblBase + p65Rel + p65Len));
+writePng(outGaugePreview, outW, outH, decoded65);
 
-const p81 = picTblBase + 81 * 24;
-const p81Rel = lcd.readUInt32LE(p81 + 4), p81Len = lcd.readUInt32LE(p81 + 12);
+// Decode Pic 81 directly from the written .lcd buffer to verify custom splash + disclaimer integrity
+const p81Entry = picTblBase + 81 * 24;
+const p81Rel = lcd.readUInt32LE(p81Entry + 4), p81Len = lcd.readUInt32LE(p81Entry + 12);
 const decoded81 = decodePicRle(lcd.subarray(picTblBase + p81Rel, picTblBase + p81Rel + p81Len));
 writePng(outSplashPreview, outW, outH, decoded81);
 
