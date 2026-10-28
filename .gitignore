@@ -1,5 +1,6 @@
 # Firmware container binaries
 firmware/*.lcd
+firmware/**/*.lcd
 
 # Extracted binary partitions
 extracted/*.bin
