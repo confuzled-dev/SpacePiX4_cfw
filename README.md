@@ -3,7 +3,7 @@
 An open-source reverse engineering, binary analysis, and custom firmware build framework for the **Creality SpacePi X4** dual-chamber filament dryer (`DB-05` hardware platform).
 > [!WARNING]
 > **HARDWARE IS CAPABLE OF HIGHER TEMPERATURES, BUT EXTENSIVE TESTING HAS NOT FINISHED**
-> THERE BE DRAGONS AHEAD
+> **THERE BE DRAGONS AHEAD**
 
 > [!NOTE]
 > **Base Firmware Policy:** The latest official 1st-party release (**`v0.2.9_3.1_cspx4.lcd`**, MCU build `"Jun  1 2026"` + refactored UI `"_3.1"`) is the official working framework for all custom firmware builds and future revisions. Older firmware versions have been moved to `firmware/FW_Archive/` and are fully cataloged in `docs/` and `extracted/` for reference. All custom firmware files append `*_cfw` before the `.lcd` extension, with prior custom builds archived in `firmware/CFW_Archive/`.
