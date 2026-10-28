@@ -1,6 +1,6 @@
 # Creality SpacePi X4 Custom Firmware (`3.0.1_0`) & Reverse Engineering Suite
 
-An open-source reverse engineering, binary analysis, and custom firmware build framework for the **Creality SpacePi X4** dual-chamber filament dryer (`DB-05` hardware platform).
+An open-source *LLM-led* reverse engineering, binary analysis, and custom firmware build framework for the **Creality SpacePi X4** dual-chamber filament dryer (`DB-05` hardware platform).
 > [!WARNING]
 > **HARDWARE IS CAPABLE OF HIGHER TEMPERATURES, BUT EXTENSIVE TESTING HAS NOT FINISHED**
 > **THERE BE DRAGONS AHEAD**
