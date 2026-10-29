@@ -14,7 +14,7 @@ An open-source *LLM-led* reverse engineering, binary analysis, and custom firmwa
 >
 > This process can be reversed by flashing the device via Micro SD card slot with a retail or beta firmware provided by Creality. The latest retail firmware is available [HERE](https://www.creality.com/download/creality-spacepi-x4)
 ---
-[To skip to build instructions](https://github.com/confuzled-dev/SpacePiX4_cfw#building--installing-v301_0_cspx4_cfwlcd)
+[Skip to build instructions](https://github.com/confuzled-dev/SpacePiX4_cfw#building--installing-v301_0_cspx4_cfwlcd)
 ## Custom Firmware `3.0.1_0` (`v3.0.1_0_cspx4_cfw.lcd`)
 
 Built directly on top of the beta **`v0.2.9_3.1_cspx4.lcd`** base, custom firmware incorporates:
@@ -38,19 +38,19 @@ Built directly on top of the beta **`v0.2.9_3.1_cspx4.lcd`** base, custom firmwa
       - **`[E03L/R]` (Abnormal Heating / Lid Open):** Checks `AHT_Temp < Target_Temp - 5.0°C` (**`90.0°C`** at a `95°C` setpoint) after `900` seconds (`15` minutes).
       - **`[E04L/R]` (AHT20 Sensor Timeout):** Unchanged.
 
-### 2. Full Native `320×240` (`1×1` Pixel, 16-Bit RGB565) Custom Splash Screen
-- Stores the full native `320×240` (`1×1` pixel, 16-bit RGB565) custom splash image (`Pic 81`, `1,902` RLE blocks = `41,882` bytes) in the `61,058`-byte unused zero-padding region (`0x301180..0x30B51A`) between the Font section and the Code section (`0x310000`).
-- **Preserves Heating Gauge Assets (`Pic 0..80`):** `Pic 0` through `Pic 80` are the dynamic circular temperature-gauge ring states (`0°C` to `80°C`) for the active drying chambers. Leaving `Pic 0..80` completely factory-original guarantees clean, artifact-free gauge rings at all drying temperatures (`0°C .. 95°C`).
-- Eliminates all horizontal pixel grouping (`2×1`/`3×1`) and color posterization, while keeping all 218 picture descriptors valid.
+### 2. Custom Boot Splash/Disclaimer
+- **User Configurable Splash image:** Supports the addition of a 320×240 16-bit RGB565 custom splash image (`Pic 81`, `1,902` RLE blocks = `41,882` bytes) in the `61,058`-byte unused zero-padding region (`0x301180..0x30B51A`) between the Font section and the Code section (`0x310000`).
+  - Current Approach (`Pic 81`): Existing boot image has been modified with added safety warning/disclaimer.
+  - Tentative Plan: Investigating viability of a user-driven risk acceptance screen within the boot step with a QR reference link for this GitHub. Checking for viability of a boot loop sequence if the user does not accept risks and a flag system to initiate restoration of default thermal limit without user intervention.
 
-### 3. Boot Process Disclaimer Notice
+
 - Displays the required notice **`"ALPHA FIRMWARE: NO WARRANTY, EXPRESS OR IMPLIED"`** prominently on the boot splash screen (`Pic 81`, held on `Page 0` for `2,000 ms` during startup) in crisp amber text (`y = 227..233`) along the bottom margin.
 
-| Clean 65°C Chamber Gauge (`Pic 65`) | Native `1×1` Custom Splash + Disclaimer (`Pic 81`) |
+| Custom Splash + Disclaimer (`Pic 81`) | Custom Splash + Disclaimer (`Pic 81`) |
 | :---: | :---: |
-| ![Chamber Gauge Preview](extracted/v3.0.1_0_pic65_gauge_preview.png) | ![Custom Splash Preview](extracted/v3.0.1_0_splash_preview.png) |
+| ![Custom Splash Preview](extracted/v3.0.1_0_splash_preview.png) | ![Custom Splash Preview](extracted/v3.0.1_0_splash_preview.png) |
 
-### 4. Firmware Version `3.0.1_0` (MCU + HMI UI)
+### 3. Firmware Version `3.0.1_0` (MCU + HMI UI)
 - **MCU Partition:**
   - `.lcd` `0x3F6F2C` (`mcu.bin+0x49C0`): Version tuple `00 02 09 00` (`0.2.9`) → **`03 00 01 00` (`3.0.1`)**.
   - `.lcd` `0x3F6F4E` (`mcu.bin+0x49E2`): Boot banner outputs `"Software version: V3.0.1, Date:Jun  1 2026\r\n"`.
