@@ -14,8 +14,9 @@ An open-source *LLM-led* reverse engineering, binary analysis, and custom firmwa
 >
 > This process can be reversed by flashing the device via Micro SD card slot with a retail or beta firmware provided by Creality. The latest retail firmware is available [HERE](https://www.creality.com/download/creality-spacepi-x4)
 ---
-[Skip to build instructions](https://github.com/confuzled-dev/SpacePiX4_cfw#building--installing-v301_0_cspx4_cfwlcd)
-[Afraid of github? Try this webapp instead](https://drxen00.github.io/PiXfourge/)
+> [Skip to build instructions](https://github.com/confuzled-dev/SpacePiX4_cfw#building--installing-v301_0_cspx4_cfwlcd)
+>
+> [Afraid of github? Try this webapp instead](https://drxen00.github.io/PiXfourge/)
 
 ## Custom Firmware `3.0.1_0` (`v3.0.1_0_cspx4_cfw.lcd`)
 
